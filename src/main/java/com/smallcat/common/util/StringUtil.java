@@ -464,8 +464,8 @@ public class StringUtil {
 	/**
 	 * 将带分隔符的字符串转换成list
 	 */
-	public static List splitString(String str, String separator) {
-		return new ArrayList(Arrays.asList(str.split(separator)));
+	public static List<String> splitString(String str, String separator) {
+		return new ArrayList<String>(Arrays.asList(str.split(separator)));
 	}
 
 	public static String xml2String(byte[] xml) {
@@ -567,10 +567,10 @@ public class StringUtil {
 			return ((CharSequence) obj).length() == 0;
 
 		if (obj instanceof Collection)
-			return ((Collection) obj).isEmpty();
+			return ((Collection<?>) obj).isEmpty();
 
 		if (obj instanceof Map)
-			return ((Map) obj).isEmpty();
+			return ((Map<?, ?>) obj).isEmpty();
 
 		if (obj instanceof Object[]) {
 			Object[] object = (Object[]) obj;
@@ -592,8 +592,8 @@ public class StringUtil {
 	 * @param separator
 	 * @return
 	 */
-	public static List str2List(String str, String separator) {
-		List result = new ArrayList();
+	public static List<String> str2List(String str, String separator) {
+		List<String> result = new ArrayList<String>();
 		if (str.indexOf(separator) < 0) {
 			result.add(str);
 		} else {
@@ -745,7 +745,7 @@ public class StringUtil {
 				String name = propertyDescs[i].getName();
 				Method getter = propertyDescs[i].getReadMethod();
 				if (getter != null && !name.equals("class")) {
-					Object value = getter.invoke(obj, null);
+					Object value = getter.invoke(obj, new Object[]{null});
 					buf.append(name).append("=").append(value).append(" ");
 				}
 			}
@@ -835,14 +835,12 @@ public class StringUtil {
 		return buf.toString();
 	}
 
-	private static Map zhLen = new HashMap(), enLen = new HashMap();
+	private static Map<String, Integer> zhLen = new HashMap<String, Integer>();
+	private static Map<String, Integer> enLen = new HashMap<String, Integer>();
 
 	private static final String zh = "汉";
 
 	private static final String en = "A";
-
-	private static final char a[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd',
-		'e', 'f' };
 
 	/**
 	 * 将List中内的MAP字串转换为MAP对象
@@ -851,8 +849,8 @@ public class StringUtil {
 	 * @author caoke
 	 * @return
 	 */
-	public static List listString2Map(List listMapInner) {
-		List list = new ArrayList();
+	public static List<Map<String, String>> listString2Map(List<String> listMapInner) {
+		List<Map<String, String>> list = new ArrayList<Map<String, String>>();
 		for (int i = 0; i < listMapInner.size(); i++) {
 			Object map = listMapInner.get(i);
 			if (map != null) {
@@ -869,12 +867,12 @@ public class StringUtil {
 	 * @author caoke
 	 * @return
 	 */
-	public static String map2String(Map map) {
+	public static String map2String(Map<String, Object> map) {
 		StringBuffer sb = new StringBuffer();
 		boolean isFirst = true;
-		for (Iterator it = map.entrySet().iterator(); it.hasNext();) {
-			Entry entry = (Entry) it.next();
-			Object key = entry.getKey();
+		for (Iterator<Entry<String, Object>> it = map.entrySet().iterator(); it.hasNext();) {
+			Entry<String, Object> entry = it.next();
+			String key = entry.getKey();
 			Object value = entry.getValue();
 			if (key != null && value != null) {
 				if (!isFirst) {
@@ -882,7 +880,7 @@ public class StringUtil {
 				} else {
 					isFirst = false;
 				}
-				sb.append(normalizeMapString(key.toString().trim()));
+				sb.append(normalizeMapString(key.trim()));
 				sb.append("=");
 				sb.append(normalizeMapString(value.toString().trim()));
 			}
@@ -897,8 +895,8 @@ public class StringUtil {
 	 * @author caoke
 	 * @return
 	 */
-	public static Map string2Map(String str) {
-		Map map = new HashMap();
+	public static Map<String, String> string2Map(String str) {
+		Map<String, String> map = new HashMap<String, String>();
 		String[] entrys = StringUtils.tokenizeToStringArray(str, ",");
 		for (int i = 0; i < entrys.length; i++) {
 			String[] entry = StringUtils.tokenizeToStringArray(entrys[i], "=");
@@ -992,12 +990,12 @@ public class StringUtil {
 	 * @param list
 	 * @return String
 	 */
-	public static String ListToString(List list) {
+	public static String ListToString(List<Map<String, String>> list) {
 		String listString = "";
 		if (list != null && list.size() != 0) {
 			for (int i = 0; i < list.size(); i++) {
-				String curr = (String) (((Map) (list.get(i))).get("currency"));
-				String amout = ((Map) (list.get(i))).get("amount").toString();
+				String curr = list.get(i).get("currency");
+				String amout = list.get(i).get("amount");
 				listString = listString + curr + "|" + amout + "@";
 			}
 			return listString;
@@ -1032,7 +1030,7 @@ public class StringUtil {
 			return "null";
 		}
 
-		Class klass = obj instanceof Class ? (Class) obj : obj.getClass();
+		Class<?> klass = obj instanceof Class ? (Class<?>) obj : obj.getClass();
 		String fullname = klass.getName();
 		int packageNameLength = klass.getPackage().getName().length();
 		return packageNameLength > 0 ? fullname.substring(packageNameLength + 1) : fullname;
@@ -1150,7 +1148,7 @@ public class StringUtil {
 	 * @return
 	 */
 	public static String creatContent(String transstatus,String currency,String summary,BigDecimal amount,String args) {
-		Map map = new HashMap();
+		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("TransStatus",transstatus);
 		map.put("CurrencyCode", currency);
 		map.put("Summary", summary);
@@ -1285,7 +1283,7 @@ public class StringUtil {
 		
 		try{
         	/** 获取源对象类及其属性 */
-            Class type = obj_s.getClass();
+            Class<?> type = obj_s.getClass();
             Field[] fields = type.getDeclaredFields();
             
             for (int i=0;i<fields.length;i++) {
@@ -1441,7 +1439,10 @@ public class StringUtil {
      * @since  1.5
      */
     public static String format(String format, Object ... args) {
-    	return new Formatter().format(format, args).toString();
+    	Formatter formatter = new Formatter();
+    	String rtnVal = formatter.format(format, args).toString();
+    	formatter.close();
+		return rtnVal;
     }
     
 	public static boolean belong(String str, String[] aimStrings) {
