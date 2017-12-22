@@ -17,8 +17,12 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Excel2003 implements ExcelFunction{
+
+	private static Logger logger = LoggerFactory.getLogger(Excel2003.class);
 
 	@Override
 	public List<List<String>> importExcel(InputStream is, ExcelConfigation conf) {

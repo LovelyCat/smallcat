@@ -20,8 +20,12 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Excel2007 implements ExcelFunction {
+
+	private static Logger logger = LoggerFactory.getLogger(Excel2003.class);
 
 	@Override
 	public List<List<String>> importExcel(InputStream is, ExcelConfigation conf) {
