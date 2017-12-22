@@ -60,6 +60,11 @@ public class EmailController {
             if(emailParamDto.getCcEmails() != null && !"".contentEquals(emailParamDto.getCcEmails())){
                 messageHelper.setCc(emailParamDto.getCcEmails().split(EMAIL_SPLIT));
             }
+
+            String[] fileNames = emailParamDto.getAttachFileNames();
+            for(String fileName : fileNames){
+                messageHelper.addAttachment(fileName, null, "");
+            }
             javaMailSender.send(message);
             logger.info(LOGGER_PREFIX + "[sendEmail]成功发送邮件。threadId={}", Thread.currentThread().getId());
         } catch (Exception e) {
