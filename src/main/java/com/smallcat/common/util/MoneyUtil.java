@@ -98,7 +98,7 @@ public class MoneyUtil
      * 根据币种格式化金额
      * 
      * @param money 金额
-     * @param Currency对象
+     * @param currency Currency对象
      * @author xulc
      * @return
      */
@@ -136,9 +136,9 @@ public class MoneyUtil
      * 
      * @author:许笠晨
      * 
-     * @param List
-     * @param String 币种字段的key值
-     * @param String 金额字段的key值
+     * @param onePageList
+     * @param curCdeKey 币种字段的key值
+     * @param moneyKey 金额字段的key值
      */
     public static List getSumarryInList(List onePageList,String curCdeKey,String moneyKey)
     {
@@ -202,8 +202,8 @@ public class MoneyUtil
      * 
      * @author:许笠晨
      * 
-     * @param List
-     * @param String 要相加的字段的key值
+     * @param list
+     * @param key 要相加的字段的key值
      */
     public static String getSumarryByKey(List list,String key)
     {
@@ -227,7 +227,7 @@ public class MoneyUtil
     }
 
     /** 功能: 将小写金额转换为大写金额<br>
-     *  @param String str: 小写金额字符串<br>
+     *  @param str str: 小写金额字符串<br>
      *  @return String 大写金额字符串<br>
      *  @version:    1.0<br>
      * @author name：zhoujianguo <br>

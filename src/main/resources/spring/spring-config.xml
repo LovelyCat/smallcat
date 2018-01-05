@@ -79,5 +79,6 @@
         <aop:advisor id="txAdvisor" advice-ref="txAdvice" pointcut-ref="txPointcut"/>
     </aop:config>
 
-    <import resource="classpath:spring-config-shiro.xml"/>
+    <import resource="classpath:spring/spring-config-shiro.xml"/>
+    <import resource="classpath:spring/spring-email.xml"/>
 </beans>
