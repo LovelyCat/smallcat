@@ -12,36 +12,34 @@ import java.util.Locale;
 import java.util.Map;
 
 
-
 /**
  * MoneyUtil.java
  * 金额处理相关工具
- * 
- * @version 1.0
+ *
  * @author xulc
- * Written Date: 2007-7-31
- * 
- * Modified By: 
- * Modified Date:
+ *         Written Date: 2007-7-31
+ *         <p>
+ *         Modified By:
+ *         Modified Date:
+ * @version 1.0
  */
-public class MoneyUtil 
-{
+public class MoneyUtil {
     private final static String NO_DECPOS = "#,##0";//辅币位数0
     private final static String ONE_DECPOS = "#,##0.0";//辅币位数1
     private final static String TWO_DECPOS = "#,##0.00";//辅币位数2
     private final static String THR_DECPOS = "#,##0.000";//辅币位数3
 
-    
+
     private static String ChnDigiStr[] =
-        new String[] { "零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖" };
+            new String[]{"零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖"};
 
     private static String ChnDiviStr[] =
-        new String[] {"","拾","佰","仟",   "万","拾","佰","仟",    "亿","拾","佰","仟",    "万","拾","佰","仟",    "亿","拾","佰","仟",    "万","拾","佰","仟" };
-        
+            new String[]{"", "拾", "佰", "仟", "万", "拾", "佰", "仟", "亿", "拾", "佰", "仟", "万", "拾", "佰", "仟", "亿", "拾", "佰", "仟", "万", "拾", "佰", "仟"};
 
 
     /**
      * 转为BigDecimal[]
+     *
      * @param object
      * @return
      */
@@ -58,6 +56,7 @@ public class MoneyUtil
 
     /**
      * 转为BigDecimal
+     *
      * @param object：BigDecimal，String or Number
      * @return
      */
@@ -69,13 +68,12 @@ public class MoneyUtil
 
         if (object instanceof BigDecimal)
             result = (BigDecimal) object;
-        else if (object instanceof String) 
-        {
+        else if (object instanceof String) {
             String tmp = (String) object;
-            
+
             if (tmp.indexOf(",") != -1)
-                tmp = tmp.replaceAll(",","");
-                
+                tmp = tmp.replaceAll(",", "");
+
             result = new BigDecimal(tmp);
         } else if (object instanceof Number) {
             result = new BigDecimal(((Number) object).doubleValue());
@@ -96,67 +94,56 @@ public class MoneyUtil
 
     /**
      * 根据币种格式化金额
-     * 
-     * @param money 金额
+     *
+     * @param money    金额
      * @param currency Currency对象
-     * @author xulc
      * @return
+     * @author xulc
      */
-    public static String formatMoney(Object money,Currency currency) 
-    {
+    public static String formatMoney(Object money, Currency currency) {
         if (money == null || currency == null)
             return null;
 
-        try
-        {
+        try {
             money = getBigDecimal(money);
-        }
-        catch(Exception e)
-        {
-            return (String)money;
+        } catch (Exception e) {
+            return (String) money;
         }
 
         String pattern = getPattern(currency.getFraction());
 
-        try 
-        {
-            DecimalFormat format = (DecimalFormat)NumberFormat.getInstance(Locale.US);
+        try {
+            DecimalFormat format = (DecimalFormat) NumberFormat.getInstance(Locale.US);
             format.applyPattern(pattern);
 
             return format.format(money);
-        }
-        catch(Exception e) 
-        {
+        } catch (Exception e) {
             return null;
         }
     }
 
     /**
      * 从LIST中分币种汇总金额,并按照币种排序
-     * 
-     * @author:许笠晨
-     * 
+     *
      * @param onePageList
-     * @param curCdeKey 币种字段的key值
-     * @param moneyKey 金额字段的key值
+     * @param curCdeKey   币种字段的key值
+     * @param moneyKey    金额字段的key值
+     * @author:许笠晨
      */
-    public static List getSumarryInList(List onePageList,String curCdeKey,String moneyKey)
-    {
-        if (StringUtil.isNullOrEmpty(onePageList))
+    public static List getSumarryInList(List onePageList, String curCdeKey, String moneyKey) {
+        if (StringUtil.isEmpty(onePageList))
             return null;
-        
+
         List resList = new ArrayList();
         Map addMap = null;
-        
-        for(int i = 0; i < onePageList.size(); i++)
-        {
-            Map tmp = (Map)onePageList.get(i);
 
-            if (tmp == null || StringUtil.isNullOrEmpty(tmp.get(curCdeKey)) || StringUtil.isNullOrEmpty(tmp.get(moneyKey)))
+        for (int i = 0; i < onePageList.size(); i++) {
+            Map tmp = (Map) onePageList.get(i);
+
+            if (tmp == null || StringUtil.isEmpty(tmp.get(curCdeKey)) || StringUtil.isEmpty(tmp.get(moneyKey)))
                 continue;
 
-            if (i == 0)
-            {
+            if (i == 0) {
                 Map once = new HashMap();
                 once.putAll(tmp);
 
@@ -166,86 +153,76 @@ public class MoneyUtil
 
             boolean addFlag = false;
 
-            for(int j = 0; j < resList.size(); j++)
-            {
-                Map resTmp = (Map)resList.get(j);
+            for (int j = 0; j < resList.size(); j++) {
+                Map resTmp = (Map) resList.get(j);
 
-                if (tmp.get(curCdeKey).toString().equals(resTmp.get(curCdeKey).toString()))
-                {
-                    resTmp.put(moneyKey,doMath(resTmp.get(moneyKey).toString(),tmp.get(moneyKey).toString(),1,2));
+                if (tmp.get(curCdeKey).toString().equals(resTmp.get(curCdeKey).toString())) {
+                    resTmp.put(moneyKey, doMath(resTmp.get(moneyKey).toString(), tmp.get(moneyKey).toString(), 1, 2));
                     addFlag = true;
                     break;
-                }
-                else
+                } else
                     continue;
             }
-            
-            if (!addFlag)
-            {
+
+            if (!addFlag) {
                 addMap = new HashMap();
                 addMap.putAll(tmp);
-                
+
                 resList.add(addMap);
                 addFlag = false;
             }
         }
-        
-        Collections.sort(resList,new MyComparator(curCdeKey));
+
+        Collections.sort(resList, new MyComparator(curCdeKey));
         Collections.reverse(resList);
-        
+
         return resList;
     }
 
 
     /**
      * 将List中的某个字段相加
-     * 
-     * @author:许笠晨
-     * 
+     *
      * @param list
-     * @param key 要相加的字段的key值
+     * @param key  要相加的字段的key值
+     * @author:许笠晨
      */
-    public static String getSumarryByKey(List list,String key)
-    {
+    public static String getSumarryByKey(List list, String key) {
         String res = "0";
-        
-        for(int i = 0; i < list.size(); i++)
-        {
-            Map tmp = (Map)list.get(i);
-            
-            if (StringUtil.isNullOrEmpty(tmp.get(key)))
+
+        for (int i = 0; i < list.size(); i++) {
+            Map tmp = (Map) list.get(i);
+
+            if (StringUtil.isEmpty(tmp.get(key)))
                 continue;
-                
-            try
-            {
-                res = doMath(res,tmp.get(key).toString(),1,2);
-            }catch(Exception e){}
+
+            try {
+                res = doMath(res, tmp.get(key).toString(), 1, 2);
+            } catch (Exception e) {
+            }
 
         }
-        
+
         return res;
     }
 
-    /** 功能: 将小写金额转换为大写金额<br>
-     *  @param str str: 小写金额字符串<br>
-     *  @return String 大写金额字符串<br>
-     *  @version:    1.0<br>
-     * @author name：zhoujianguo <br>
-     * Written Date：2007/05/23<br> 
+    /**
+     * 功能: 将小写金额转换为大写金额<br>
+     *
+     * @param lowerMoney lowerMoney: 小写金额字符串<br>
+     * @return String 大写金额字符串<br>
+     * @version: 1.0<br>
      */
-    public static String money2ChnText(String str) {
+    public static String money2ChnText(String lowerMoney) {
         //原来有的程序处理了格式化字符串，有的没有处理，为了兼容，统一把格式化逗号替换掉
-        str = str.replaceAll(",", "");
+        lowerMoney = lowerMoney.replaceAll(",", "");
         String result = "";
         double val = 0.0;
-        try{
-            val =  (new Double(str)).doubleValue();
-        }
-        catch(Exception e){
+        try {
+            val = (new Double(lowerMoney)).doubleValue();
+        } catch (Exception e) {
             return "";
-            
         }
-        
 
         String TailStr = "";
         long fraction, integer;
@@ -254,8 +231,9 @@ public class MoneyUtil
         if (val < 0) {
             val = -val;
         }
-        if (val > 9999999999999.99 || val < -9999999999999.99)
+        if (val > 9999999999999.99 || val < -9999999999999.99) {
             return "";
+        }
         // 四舍五入到分  
         long temp = Math.round(val * 100);
         integer = temp / 100;
@@ -274,14 +252,12 @@ public class MoneyUtil
             if (fen != 0)
                 TailStr += ChnDigiStr[fen] + "分";
 
-            if(integer == 0){
+            if (integer == 0) {
                 result = TailStr;
-            }
-            else{
+            } else {
                 result = PositiveInteger2ChnStr(String.valueOf(integer)) + "元" + TailStr;
             }
         }
-
         //return PositiveInteger2ChnStr(String.valueOf(integer)) + "元" + TailStr;
         return result;
     }
@@ -293,8 +269,9 @@ public class MoneyUtil
         boolean beginzero = false;
         int len, n;
         len = NumStr.length();
-        if (len > 15)
+        if (len > 15) {
             return "";
+        }
         for (int i = len - 1; i >= 0; i--) {
             if (NumStr.charAt(len - i - 1) == ' ')
                 continue;
@@ -302,12 +279,13 @@ public class MoneyUtil
             if (n < 0 || n > 9)
                 return "";
             if (n != 0) {
-                if(beginzero == true){
+                if (beginzero == true) {
                     RMBStr += "零";
                     beginzero = false;
                 }
-                if (lastzero)
+                if (lastzero) {
                     RMBStr += ChnDigiStr[0]; // 若干零后若跟非零值，只显示一个零
+                }
                 // 除了亿万前的零不带到后面
                 /*if (!(n == 1 && (i % 4) == 1 && i == len - 1)) // 十进位处于第一位不发壹音modi 20070529*/
                 RMBStr += ChnDigiStr[n];
@@ -317,7 +295,7 @@ public class MoneyUtil
             } else {
                 beginzero = true;
                 if ((i % 8) == 0
-                    || ((i % 8) == 4 && hasvalue)) // 亿万之间必须有非零值方显示万
+                        || ((i % 8) == 4 && hasvalue)) // 亿万之间必须有非零值方显示万
                     RMBStr += ChnDiviStr[i]; // “亿”或“万”
             }
             if (i % 8 == 0)
@@ -325,65 +303,59 @@ public class MoneyUtil
             lastzero = (n == 0) && (i % 4 != 0);
         }
 
-        if (RMBStr.length() == 0)
+        if (RMBStr.length() == 0) {
             return ChnDigiStr[0]; // 输入空字符或"0"，返回"零"
+        }
         //System.out.println("before replace:" + RMBStr);
-        RMBStr = RMBStr.replaceAll("零零","零");
+        RMBStr = RMBStr.replaceAll("零零", "零");
         //System.out.println("after  replace:" + RMBStr);
         return RMBStr;
     }
 
     /**
-     *  Description：对于两个字符串型的数字做运算
+     * Description：对于两个字符串型的数字做运算
      *
-     *  @author:许笠晨
-     *  @param parameter str1:+表示加数;-表示减数;*表示乘数;/表示除数;
-     *                   str2:+表示被加数;-表示被减数;*表示被乘数;/表示被除数;
-     *                   type:1表示做加法;2表示做减法;3表示做乘法;4表示做除法;
-     *                   llen:表示保留小数的位数,2表示保留2位小数.
-     *
-     *  @return 説明 运算结果
+     * @param str1:+表示加数;-表示减数;*表示乘数;/表示除数;
+     * @param str2:+表示被加数;-表示被减数;*表示被乘数;/表示被除数;
+     * @param type:1表示做加法;2表示做减法;3表示做乘法;4表示做除法;
+     * @param llen:表示保留小数的位数,2表示保留2位小数.
+     * @return 説明 运算结果
+     * @author:许笠晨
      */
-    public static String doMath(String str1,String str2,int type,int llen)
-    {
+    public static String doMath(String str1, String str2, int type, int llen) {
         BigDecimal a = new BigDecimal(str1);
         BigDecimal b = new BigDecimal(str2);
-        
-        switch(type)
-        {
+
+        switch (type) {
             case 1:
-                return a.add(b).setScale(llen,4).toString();
+                return a.add(b).setScale(llen, 4).toString();
             case 2:
-                return a.add(b.negate()).setScale(llen,4).toString();
+                return a.add(b.negate()).setScale(llen, 4).toString();
             case 3:
-                return a.multiply(b).setScale(llen,4).toString();
+                return a.multiply(b).setScale(llen, 4).toString();
             case 4:
-                return a.divide(b,llen,4).toString();
+                return a.divide(b, llen, 4).toString();
             default:
                 throw new IllegalArgumentException();
-                
         }
     }
 
     /**
      * 根据辅币位数得到相应的pattern
-     * 
+     *
      * @param tempDecpos
-     * @author xulc
      * @return
+     * @author xulc
      */
-    private static String getPattern(Integer tempDecpos)
-    {
+    private static String getPattern(Integer tempDecpos) {
         int dec = 2;
-        
-        try
-        {
+
+        try {
             dec = tempDecpos.intValue();
+        } catch (Exception e) {
         }
-        catch(Exception e){}
-        
-        switch(dec)
-        {
+
+        switch (dec) {
             case 0:
                 return NO_DECPOS;
             case 1:
@@ -397,56 +369,50 @@ public class MoneyUtil
         }
     }
 
-    private static class MyComparator implements Comparator
-    {
+    private static class MyComparator implements Comparator {
         private String curCdeKey;
-        
-        public MyComparator(String curCdeKey)
-        {
+
+        public MyComparator(String curCdeKey) {
             this.curCdeKey = curCdeKey;
         }
-        
-        public int compare(Object o1,Object o2)
-        {
-            Object tmp1 = ((Map)o1).get(curCdeKey);
-            Object tmp2 = ((Map)o2).get(curCdeKey);
+
+        public int compare(Object o1, Object o2) {
+            Object tmp1 = ((Map) o1).get(curCdeKey);
+            Object tmp2 = ((Map) o2).get(curCdeKey);
             int i1 = 0;
             int i2 = 0;
-            
-            if (tmp1 instanceof String)
-            {
-                i1 = Integer.parseInt((String)tmp1);
-                i2 = Integer.parseInt((String)tmp2);
+
+            if (tmp1 instanceof String) {
+                i1 = Integer.parseInt((String) tmp1);
+                i2 = Integer.parseInt((String) tmp2);
+            } else {
+                i1 = Integer.parseInt(((Currency) tmp1).getCode());
+                i2 = Integer.parseInt(((Currency) tmp2).getCode());
             }
-            else
-            {
-                i1 = Integer.parseInt(((Currency)tmp1).getCode());
-                i2 = Integer.parseInt(((Currency)tmp2).getCode());
-            }
-            
+
             if (i1 < i2)
                 return 1;
             else
                 return 0;
         }
     }
-    public static void main(String atrs[]){
-    	
+
+    public static void main(String atrs[]) {
+
     }
 
     /**
      * 根据牌价和金额计算出转换为人民币金额
-     * 
      */
-    public static BigDecimal exchangeRMBAmount(BigDecimal rate,BigDecimal amount){
-		amount = (amount.multiply(rate)).divide(new BigDecimal("100"), 4, BigDecimal.ROUND_HALF_UP);
-		
-		DecimalFormat df = (DecimalFormat)NumberFormat.getInstance();
+    public static BigDecimal exchangeRMBAmount(BigDecimal rate, BigDecimal amount) {
+        amount = (amount.multiply(rate)).divide(new BigDecimal("100"), 4, BigDecimal.ROUND_HALF_UP);
 
-		df.setMaximumFractionDigits(2);
-		df.setMinimumFractionDigits(2);
-		String strRet = df.format(amount);
-		
-		return new BigDecimal(strRet.replaceAll(",", ""));
+        DecimalFormat df = (DecimalFormat) NumberFormat.getInstance();
+
+        df.setMaximumFractionDigits(2);
+        df.setMinimumFractionDigits(2);
+        String strRet = df.format(amount);
+
+        return new BigDecimal(strRet.replaceAll(",", ""));
     }
 }
